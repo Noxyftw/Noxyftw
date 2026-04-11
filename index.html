@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Noxyftw</title>
+
+<link rel="icon" type="image/webp" href="avatar.webp">
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&family=Pacifico&family=Baloo+2:wght@400;600;700&display=swap" rel="stylesheet">
+
+<style>
+* {margin:0; padding:0; box-sizing:border-box;}
+body, html {width:100%; height:100%; overflow:hidden; font-family:'Poppins', sans-serif; background:black;}
+
+#enterScreen {
+    position:fixed;
+    width:100%;
+    height:100%;
+    background:black;
+    color:white;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:2rem;
+    cursor:pointer;
+    transition:opacity 0.6s ease;
+    z-index:10;
+}
+
+#enterScreen.fade {opacity:0;}
+
+#main {
+    width:100%;
+    height:100%;
+    position:relative;
+    opacity:0;
+    transition:opacity 0.8s ease;
+}
+
+#main.show {opacity:1;}
+
+video {
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    filter:blur(8px) brightness(0.5);
+    z-index:0;
+}
+
+canvas {
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    z-index:1;
+    pointer-events:none;
+}
+
+.icon {
+    position:absolute;
+    top:20px;
+    width:38px;
+    height:38px;
+    cursor:pointer;
+    z-index:3;
+    filter:invert(1);
+    transition:0.2s;
+}
+
+.icon:hover {transform:scale(1.1);}
+
+.discord {left:20px;}
+.cart {left:70px;}
+
+.center {
+    position:absolute;
+    top:50%;
+    left:50%;
+    transform:translate(-50%, -50%);
+    text-align:center;
+    color:white;
+    z-index:2;
+}
+
+.avatar {
+    width:110px;
+    height:110px;
+    border-radius:50%;
+    object-fit:cover;
+    margin-bottom:15px;
+}
+
+.name {
+    font-size:3rem;
+    font-weight:700;
+    color:#d291ff;
+    font-family:'Pacifico', cursive;
+}
+
+.desc {
+    font-size:1.2rem;
+    margin-top:10px;
+    font-family:'Baloo 2', sans-serif;
+    font-weight:600;
+}
+</style>
+</head>
+<body>
+
+<div id="enterScreen">click to enter &lt;3</div>
+
+<div id="main">
+
+<a href="https://discord.com/users/1284534512574926909" target="_blank">
+<img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/discord.svg" class="icon discord">
+</a>
+
+<a href="https://discord.gg/d8qpZu2A" target="_blank">
+<img src="https://unpkg.com/lucide-static/icons/shopping-cart.svg" class="icon cart">
+</a>
+
+<video autoplay muted loop playsinline>
+<source src="2.mp4" type="video/mp4">
+</video>
+
+<canvas id="particles"></canvas>
+
+<div class="center">
+<img src="avatar.webp" class="avatar">
+<div class="name">! Noxyftw</div>
+<div class="desc" id="typing"></div>
+</div>
+
+<audio id="music" loop>
+<source src="1.mp3" type="audio/mp3">
+</audio>
+
+</div>
+
+<script>
+const enter=document.getElementById('enterScreen');
+const main=document.getElementById('main');
+const music=document.getElementById('music');
+
+enter.addEventListener('click',()=>{
+    enter.classList.add('fade');
+    setTimeout(()=>{
+        enter.style.display='none';
+        main.classList.add('show');
+        music.play().catch(()=>{});
+    },600);
+});
+
+const titleFrames=["I","Love","Myself","<3"];
+let ti=0;
+setInterval(()=>{document.title=titleFrames[ti];ti=(ti+1)%titleFrames.length;},500);
+
+const texts=[
+{text:"14 years old",color:"red"},
+{text:"! Noxyftw",color:"#d291ff"},
+{text:"100% UD",color:"white"},
+{text:"C++ Larp",color:"cyan"},
+{text:"Vex.cc Developer",color:"#d291ff"},
+{text:"DM Me For Dev Work",color:"red"},
+{text:"Artemis II",color:"cyan"}
+];
+
+let index=0,char=0,deleting=false;
+const typing=document.getElementById('typing');
+
+function typeEffect(){
+let c=texts[index];
+if(!deleting){char++;typing.innerHTML=`<span style="color:${c.color}">${c.text.substring(0,char)}</span>`;
+if(char>=c.text.length){deleting=true;setTimeout(typeEffect,1200);return;}}
+else{char--;typing.innerHTML=`<span style="color:${c.color}">${c.text.substring(0,char)}</span>`;
+if(char<=0){deleting=false;index=(index+1)%texts.length;}}
+setTimeout(typeEffect,deleting?40:80);
+}
+typeEffect();
+
+const canvas=document.getElementById('particles');
+const ctx=canvas.getContext('2d');
+
+function resize(){canvas.width=innerWidth;canvas.height=innerHeight;}
+resize();
+addEventListener('resize',resize);
+
+let particles=[];
+const mouse={x:null,y:null};
+addEventListener('mousemove',e=>{mouse.x=e.x;mouse.y=e.y;});
+
+for(let i=0;i<140;i++){
+particles.push({x:Math.random()*innerWidth,y:Math.random()*innerHeight,vx:(Math.random()-0.5)*0.8,vy:(Math.random()-0.5)*0.8});
+}
+
+function animate(){
+ctx.clearRect(0,0,canvas.width,canvas.height);
+
+particles.forEach(p=>{
+p.x+=p.vx;p.y+=p.vy;
+if(p.x<0||p.x>canvas.width)p.vx*=-1;
+if(p.y<0||p.y>canvas.height)p.vy*=-1;
+ctx.beginPath();ctx.arc(p.x,p.y,2,0,Math.PI*2);ctx.fillStyle='white';ctx.fill();
+
+if(mouse.x){
+let dx=mouse.x-p.x,dy=mouse.y-p.y,dist=Math.sqrt(dx*dx+dy*dy);
+if(dist<130){ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(mouse.x,mouse.y);ctx.strokeStyle='rgba(255,255,255,0.15)';ctx.stroke();}}
+});
+requestAnimationFrame(animate);
+}
+animate();
+</script>
+
+</body>
+</html>
